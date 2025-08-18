@@ -1,81 +1,127 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+  <!-- 外層版型：維持簡潔，只強化視覺風格與一致性 -->
+  <q-layout view="hHh lpR fFf" class="tech-bg">
+    <!-- 半透明霓虹 Header -->
+    <q-header elevated class="glass-header">
+      <q-toolbar class="q-py-sm">
+        <q-icon name="insights" size="28px" class="neon-icon q-mr-sm" aria-hidden="true" />
+        <q-toolbar-title class="neon-title">不動產交易趨勢</q-toolbar-title>
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <!-- 右側導覽：保留原路由，套入一致視覺 -->
+        <div class="row items-center q-gutter-xs nav-wrap">
+          <q-btn
+            flat
+            dense
+            class="btn-glass"
+            to="/"
+            label="首頁"
+            aria-label="前往首頁"
+          />
+          <q-btn
+            dense
+            unelevated
+            class="btn-neon"
+            to="/visualizeTrend"
+            label="視覺化"
+            aria-label="前往視覺化"
+          />
+        </div>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
+    <!-- 內容區：保留 router-view，提供細格網背景 -->
+    <q-page-container class="page-grid">
       <router-view />
     </q-page-container>
+
+    <!-- 底部：極簡置中，與主色調一致 -->
+    <q-footer class="glass-footer text-center q-py-sm">
+      © 2025 TW HousePrice
+    </q-footer>
   </q-layout>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-];
 
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
+<style scoped lang="scss">
+/* ===== 全域色系（與 VisualizePage 一致） ===== */
+:root {
+  --bg: #0b0f14;
+  --border: rgba(100, 181, 246, 0.18);
 }
-</script>
+
+/* ===== 背景與細格網 ===== */
+.tech-bg {
+  background:
+    radial-gradient(1200px 400px at 10% -10%, rgba(124, 77, 255, 0.08), transparent),
+    radial-gradient(800px 300px at 100% 0%, rgba(0, 229, 255, 0.08), transparent),
+    var(--bg);
+}
+.page-grid {
+  position: relative;
+}
+.page-grid::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(transparent 95%, rgba(255,255,255,0.04) 100%) 0 0/24px 24px,
+    linear-gradient(90deg, transparent 95%, rgba(255,255,255,0.04) 100%) 0 0/24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+.page-grid > * {
+  position: relative; z-index: 1; /* 讓內容在格網之上 */
+}
+
+/* ===== Header / Footer 玻璃質感 ===== */
+.glass-header,
+.glass-footer {
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+.glass-footer {
+  border-top: 1px solid var(--border);
+  border-bottom: none;
+}
+
+/* ===== 霓虹標題與圖示 ===== */
+.neon-title {
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(90deg,#b3e5fc,#d1c4e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.neon-icon { color: #80deea; }
+
+/* ===== 導覽按鈕：一深一淺，對比清楚 ===== */
+.btn-glass {
+  color: #b3e5fc;
+  border: 1px solid rgba(179,229,252,0.25);
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+  padding: 2px 12px;
+  border-radius: 10px;
+  transition: transform .12s ease, background-color .12s ease;
+}
+.btn-glass:hover { transform: translateY(-1px); background: rgba(255,255,255,0.06); }
+
+.btn-neon {
+  color: #0b0f14;
+  background: linear-gradient(90deg, #81d4fa, #b39ddb);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 14px;
+  border-radius: 10px;
+  transition: transform .12s ease, filter .12s ease;
+  box-shadow: 0 4px 14px rgba(129,212,250,0.25);
+}
+.btn-neon:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+/* ===== RWD 微調 ===== */
+@media (max-width: 600px) {
+  .neon-title { font-size: 16px; }
+  .nav-wrap { margin-left: auto; } /* 在小螢幕仍靠右 */
+}
+</style>
