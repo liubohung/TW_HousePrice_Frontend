@@ -5,7 +5,7 @@
       <div class="col-12 col-md-auto q-mb-sm q-mb-md-none">
         <div class="row items-center no-wrap">
           <q-icon name="insights" size="34px" class="neon-icon q-mr-sm" />
-          <h1 class="q-mt-none q-mb-xs neon-title">台灣房價視覺化說明</h1>
+          <h1 class="q-mt-none q-mb-xs neon-title">臺灣房價視覺化說明</h1>
         </div>
       </div>
     </section>
@@ -85,7 +85,7 @@
       <div class="row items-center justify-between q-mb-sm">
         <h3 class="section-title q-mt-none q-mb-none">如何閱讀圖表</h3>
         <div class="row q-gutter-sm">
-
+          
           <q-btn dense flat class="btn-link" color="primary" icon="help_outline" label="補值與清理說明" @click="showHelp = true" />
         </div>
       </div>
@@ -100,13 +100,11 @@
     <section class="neo-card q-pa-md q-mb-lg">
       <div class="row items-start justify-between q-col-gutter-md">
         <div class="col-12 col-md">
-          <h3 class="section-title q-mt-none q-mb-xs">快速案例：找出區域房價落差</h3>
+          <h3 class="section-title q-mt-none q-mb-xs">使用情境</h3>
           <ol class="readlist q-ml-md q-mb-sm">
-            <li>於「視覺化」頁面，使用<strong>縣市</strong>與<strong>鄉鎮</strong>篩選器鎖定目標區域。</li>
-            <li>切換<strong>建物型態</strong>（公寓／住宅大樓／透天），維持樣本可比性。</li>
-            <li>比較<strong>中位數</strong>、<strong>樣本數</strong>與<strong>四分位範圍</strong>，樣本過少時先放寬時間或型態。</li>
-            <li>拖動<strong>時間滑桿</strong>，找出兩區差距擴大或縮小的關鍵時段。</li>
-            <li>需要分享或存檔時，使用右上角<strong>下載/分享</strong>保留當前篩選。</li>
+            <li>交易概況：可知近年各區域房價走勢，不動產成交總價，以及成交建物等相關資訊，可藉由時間軸選擇年月與季，儀表板會動態呈現資料</li>
+            <li>地區概況：可由右方選擇縣市與時間後，選擇鄉鎮，檢視該區域內的總價區間交易比數，以及不同類型房產每坪價格。</li>
+            <li>交易時間趨勢：可由右方選擇縣市與建築類型後，了解每坪房價價格變化趨勢，以及該區域內成交比社與成交不動產交易總類與各季每坪交易價格變化</li>
           </ol>
         </div>
       </div>
@@ -191,7 +189,7 @@ const lastUpdated = ref('2025-08-18');
 const sources = ref([
   { name: '內政部不動產交易實價登錄', desc: '主要交易明細與欄位來源。', url: 'https://plvr.land.moi.gov.tw/', icon: 'public' },
   { name: '地政資料開放平台', desc: '行政區界、地籍及空間圖層。', url: 'https://data.gov.tw/', icon: 'layers' },
-  { name: '財政部（統計資料）', desc: '稅務相關統計，用於交叉比對與解讀。', url: 'https://www.mof.gov.tw/', icon: 'assessment' }
+
 ]);
 
 const terms = ref([
@@ -208,10 +206,10 @@ const notices = ref([
 ]);
 
 useMeta({
-  title: '台灣房價視覺化 | 說明',
+  title: '臺灣房價視覺化 | 說明',
   meta: {
     description: { name: 'description', content: 'Quasar + Tableau 的台灣房價視覺化說明頁。' },
-    ogTitle: { property: 'og:title', content: '台灣房價視覺化' },
+    ogTitle: { property: 'og:title', content: '臺灣房價視覺化' },
     ogDescription: { property: 'og:description', content: 'SSR + Tableau 嵌入的房價視覺化網站。' }
   },
   link: { canonical: { rel: 'canonical', href: 'https://your-domain.example/' } },
@@ -221,7 +219,7 @@ useMeta({
       innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: '台灣房價視覺化',
+        name: '臺灣房價視覺化',
         url: 'https://your-domain.example/'
       })
     }
@@ -266,7 +264,7 @@ html, body { background: var(--bg); }
 .header-wrap { row-gap: 6px; }
 .btn-wrap > .q-btn { width: auto; }
 @media (max-width: 600px) {
-  .neon-title { font-size: 20px; }
+  .neon-title { font-size: 32px; }
   .btn-wrap { width: 100%; }
   .btn-wrap > .q-btn { flex: 1 1 auto; }
   .hide-xs { display: none; }
@@ -275,7 +273,7 @@ html, body { background: var(--bg); }
 
 /* 霓虹標題與圖示 */
 .neon-title {
-  font-size: 28px;
+  font-size: 32px;
   letter-spacing: .4px;
   background: linear-gradient(90deg, var(--grad-start), var(--grad-end));
   -webkit-background-clip: text; background-clip: text;
@@ -322,7 +320,7 @@ html, body { background: var(--bg); }
 
 /* 區塊標題與描述 */
 .section-title {
-  font-size: 18px;
+  font-size: 32px;
   font-weight: 700;
   background: linear-gradient(90deg, #d1eaff, #e3d8ff);
   -webkit-background-clip: text; background-clip: text;
@@ -372,7 +370,7 @@ html, body { background: var(--bg); }
 .tooltip {
   background: rgba(0,0,0,.8);
   color: #e5e7eb;
-  font-size: 12px;
+  font-size: 20px;
   border-radius: 6px;
   padding: 4px 6px;
 }
