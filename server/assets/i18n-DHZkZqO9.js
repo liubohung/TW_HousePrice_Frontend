@@ -1,1 +1,0 @@
-import{d as s}from"./server-entry-DV4ePLU5.js";import{createI18n as t}from"vue-i18n/dist/vue-i18n.runtime.node.mjs";import"vue";import"quasar";import"vue/server-renderer";import"pinia";import"vue-router";const i={failed:"Action failed",success:"Action was successful"},c={"en-US":i},d=s(({app:e})=>{const o=t({locale:"en-US",legacy:!1,messages:c});e.use(o)});export{d as default};
