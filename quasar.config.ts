@@ -3,6 +3,17 @@
 
 import { defineConfig } from '#q-app/wrappers';
 import { fileURLToPath } from 'node:url';
+import type { OutputChunk, OutputAsset } from 'rollup';
+
+// 無效字元處理
+const INVALID_CHAR_REGEX: RegExp = /[\x00-\x1F\x7F<>*#"{}|^[\]`;?:&=+$,]/g;
+const DRIVE_LETTER_REGEX: RegExp = /^[a-z]:/i;
+
+// 檔案名稱清理函數
+const sanitizeFileName = (name: string): string => {
+  // 移除開頭的底線和其他無效字元
+  return name.replace(/^_+/, '').replace(INVALID_CHAR_REGEX, '');
+};
 
 export default defineConfig((ctx) => {
   return {
@@ -30,7 +41,13 @@ export default defineConfig((ctx) => {
       'roboto-font', // optional, you are not bound to it
       'material-icons', // optional, you are not bound to it
     ],
-
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        // Defines an alias for the './src' directory to simplify imports.
+        // You can use '@' in your import paths to reference files in the 'src' directory.
+      },
+    },
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
       target: {
@@ -53,6 +70,106 @@ export default defineConfig((ctx) => {
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
       // publicPath: '/',
+      publicPath: process.env.NODE_ENV === 'production' ? '/TW_HousePrice_Frontend/' : '/', // for GitHub Pages deployment
+
+      emptyOutDir: true,
+
+      rollupOptions: {
+        output: {
+          sanitizeFileName(name: string): string {
+            const match: RegExpExecArray | null = DRIVE_LETTER_REGEX.exec(name);
+            const driveLetter: string = match ? match[0] : '';
+            const cleanedName = sanitizeFileName(name.slice(driveLetter.length));
+            return driveLetter + cleanedName;
+          },
+          entryFileNames: (chunkInfo: OutputChunk) => {
+            // 移除開頭底線和清理檔案名稱
+            const cleanName = sanitizeFileName(chunkInfo.name);
+            // 確保檔案名稱不為空
+            const finalName = cleanName || 'main';
+            return `assets/${finalName}-[hash].js`;
+          },
+          chunkFileNames: (chunkInfo: OutputChunk) => {
+            // 取得原始名稱，強制移除所有底線前綴
+            let name = chunkInfo.name || 'chunk';
+
+            // 移除所有開頭的底線
+            name = name.replace(/^_+/, '');
+
+            // 處理特殊的內部 chunk 名稱
+            const nameMap: Record<string, string> = {
+              'plugin-vue_export-helper': 'vue-export-helper',
+              'plugin-vue-export-helper': 'vue-export-helper',
+              'plugin-vue': 'vue-plugin',
+              'export-helper': 'vue-helper',
+            };
+
+            // 檢查是否需要重新命名
+            for (const [pattern, replacement] of Object.entries(nameMap)) {
+              if (name.includes(pattern)) {
+                name = name.replace(pattern, replacement);
+                break;
+              }
+            }
+
+            // 最終清理
+            const cleanName = sanitizeFileName(name);
+            const finalName = cleanName || 'chunk';
+
+            console.log(`Chunk: ${chunkInfo.name} -> ${finalName}`); // 調試用
+
+            return `assets/${finalName}-[hash].js`;
+          },
+          assetFileNames: (assetInfo: OutputAsset) => {
+            // 移除開頭底線和清理檔案名稱
+            let name = assetInfo.name || 'asset';
+
+            // 強制移除所有開頭的底線
+            name = name.replace(/^_+/, '');
+
+            const cleanName = sanitizeFileName(name);
+            const finalName = cleanName || 'asset';
+
+            // 取得副檔名
+            const ext = name.includes('.') ? name.substring(name.lastIndexOf('.')) : '';
+            const nameWithoutExt = ext ? finalName.replace(ext, '') : finalName;
+
+            return `assets/${nameWithoutExt}-[hash]${ext}`;
+          },
+        },
+        // 手動控制 chunk 分割，避免自動生成底線前綴的檔案
+        manualChunks(id: string) {
+          // Vue 相關
+          if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/')) {
+            return 'vue-vendor';
+          }
+          // Vue Router
+          if (id.includes('node_modules/vue-router/')) {
+            return 'vue-router';
+          }
+          // Quasar
+          if (id.includes('node_modules/quasar/')) {
+            return 'quasar-vendor';
+          }
+          // Vue i18n
+          if (id.includes('node_modules/vue-i18n/') || id.includes('node_modules/@intlify/')) {
+            return 'vue-i18n';
+          }
+          // 處理 Vue 插件輔助函數
+          if (id.includes('plugin-vue') && id.includes('export-helper')) {
+            return 'vue-helpers';
+          }
+          // 其他大的第三方庫可以在這裡處理
+          if (id.includes('node_modules/') && !id.includes('src/')) {
+            return 'vendor';
+          }
+        },
+        // 額外的 Rollup 選項
+        treeshake: {
+          moduleSideEffects: false,
+        },
+      },
+
       // analyze: true,
       // env: {},
       // rawDefine: {}
@@ -64,6 +181,47 @@ export default defineConfig((ctx) => {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
+      // 額外的 Vite 配置來處理檔案命名
+      // 非常重要
+      extendViteConf(viteConf) {
+        // 確保 Vite 也遵循我們的命名規則
+        if (!viteConf.build) viteConf.build = {};
+        if (!viteConf.build.rollupOptions) viteConf.build.rollupOptions = {};
+        if (!viteConf.build.rollupOptions.output) viteConf.build.rollupOptions.output = {};
+
+        // 強制覆蓋任何可能導致底線前綴的設定
+        viteConf.build.rollupOptions.preserveEntrySignatures = 'strict';
+
+        // 確保我們的輸出配置不被覆蓋
+        const originalOutput = viteConf.build.rollupOptions.output;
+        viteConf.build.rollupOptions.output = {
+          ...originalOutput,
+          // 強制使用我們的命名函數
+          chunkFileNames: (chunkInfo: any) => {
+            let name = chunkInfo.name || 'chunk';
+            name = name.replace(/^_+/, '');
+
+            const nameMap: Record<string, string> = {
+              'plugin-vue_export-helper': 'vue-export-helper',
+              'plugin-vue-export-helper': 'vue-export-helper',
+              'plugin-vue': 'vue-plugin',
+              'export-helper': 'vue-helper',
+            };
+
+            for (const [pattern, replacement] of Object.entries(nameMap)) {
+              if (name.includes(pattern)) {
+                name = name.replace(pattern, replacement);
+                break;
+              }
+            }
+
+            const cleanName = sanitizeFileName(name);
+            const finalName = cleanName || 'chunk';
+
+            return `assets/${finalName}-[hash].js`;
+          },
+        };
+      },
       vitePlugins: [
         [
           '@intlify/unplugin-vue-i18n/vite',
