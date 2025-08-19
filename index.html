@@ -1,40 +1,110 @@
 <!doctype html>
-<html>
+<html lang="zh-Hant" dir="ltr">
   <head>
-    <title><%= productName %></title>
-
     <meta charset="utf-8" />
+    <title><%= productName %>｜台灣房價視覺化與不動產交易趨勢</title>
     <meta name="description" content="<%= productDescription %>" />
+    <meta name="keywords" content="房價, 房地產, 不動產, 台灣房價, 成交價, 交易量, 實價登錄, 區域房價, 視覺化, 互動圖表" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
-    <meta
-      name="viewport"
-      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>"
-    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="application-name" content="<%= productName %>" />
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="color-scheme" content="light dark" />
+    <% if (ctx.dev) { %>
+    <meta name="robots" content="noindex,nofollow" />
+    <% } else { %>
+    <meta name="robots" content="index,follow" />
+    <% } %>
 
+    <!-- Canonical -->
+    <% if (typeof siteUrl !== 'undefined') { %>
+    <link rel="canonical" href="<%= siteUrl %>" />
+    <% } %>
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= productName %>" />
+    <% if (typeof siteUrl !== 'undefined') { %>
+    <meta property="og:url" content="<%= siteUrl %>" />
+    <% } %>
+    <meta property="og:title" content="<%= productName %>｜台灣房價視覺化與不動產交易趨勢" />
+    <meta property="og:description" content="<%= productDescription %>" />
+    <meta property="og:image" content="/icons/og-image.png" />
+    <meta property="og:image:alt" content="台灣房價與不動產交易趨勢互動式視覺化" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= productName %>｜台灣房價視覺化與不動產交易趨勢" />
+    <meta name="twitter:description" content="<%= productDescription %>" />
+    <meta name="twitter:image" content="/icons/og-image.png" />
+
+    <!-- Icons -->
     <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png" />
     <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
     <link rel="icon" type="image/ico" href="favicon.ico" />
-    
-    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="<%= productName %>" />
+    <meta name="msapplication-TileColor" content="#0b0f14" />
+
+    <!-- Preconnect / Analytics -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.google-analytics.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!-- JSON-LD: WebSite -->
+    <script type="application/ld+json">
+      <%= JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": productName,
+        "description": productDescription,
+        "url": (typeof siteUrl !== "undefined") ? siteUrl : "",
+        "inLanguage": "zh-Hant",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": ((typeof siteUrl !== "undefined") ? siteUrl : "") + "?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }) %>
+    </script>
+
+    <!-- JSON-LD: SoftwareApplication (可見為資料視覺化工具) -->
+    <script type="application/ld+json">
+      <%= JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": productName,
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" }
+      }) %>
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4BZ8Q8BCC0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag(){ dataLayer.push(arguments); }
       gtag('js', new Date());
-
       gtag('config', 'G-4BZ8Q8BCC0');
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5543358382698040"
-      crossorigin="anonymous">
-    </script>
-    <meta name="google-adsense-account" content="ca-pub-5543358382698040">
   </head>
+
   <body>
+    <!-- noscript SEO 補述 -->
+    <noscript>
+      本網站提供台灣各縣市與鄉鎮市區的房價與交易趨勢之互動式視覺化。
+      若瀏覽器未啟用 JavaScript，請參考
+      <a href="/sitemap.xml">網站地圖</a> 或至 <a href="/visualize">視覺化總覽</a>。
+    </noscript>
+
     <!-- quasar:entry-point -->
   </body>
-
 </html>
